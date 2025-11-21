@@ -1,7 +1,7 @@
 class Player {
     constructor() {
         this.width = 10;
-        this.height = 20;
+        this.height = 5;
         this.positionX = 50 - this.width/2;
         this.positionY = 0;
     }
@@ -76,8 +76,18 @@ setInterval(()=>{
 }, 5000)
 
 setInterval(() => {
-    obstaclesArr.forEach(ObstacleInstance => {
-        ObstacleInstance.movedown()
+    obstaclesArr.forEach(obstacleInstance => {
+        obstacleInstance.movedown()
+
+         if (
+            player.positionX < obstacleInstance.positionX + obstacleInstance.width &&
+            player.positionX + player.width > obstacleInstance.positionX &&
+            player.positionY < obstacleInstance.positionY + obstacleInstance.height &&
+            player.positionY + player.height > obstacleInstance.positionY
+         ){
+            console.log("game over my fren!!");
+            location.href = "gameover.html"
+         }
     })
    
 }, 100);
