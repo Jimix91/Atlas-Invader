@@ -1,3 +1,21 @@
+//selecion de nave
+if (document.body.id === "page-intro") {
+
+  const ships = document.querySelectorAll('.ship');
+
+  ships.forEach(function(ship) {
+
+    ship.addEventListener('click', function() {
+      const shipId = ship.getAttribute('data-ship');
+      localStorage.setItem('selectedShip', shipId);
+      window.location.href = 'game.html';
+    });
+  });
+}
+
+
+
+
 const game = document.getElementById("game");
 const gameWidth = game.clientWidth;
 const gameHeight = game.clientHeight;
@@ -8,6 +26,7 @@ class Player {
     this.height = 80;  
     this.positionX = gameWidth / 2 - this.width / 2;
     this.positionY = 20;
+    this.selectedShip = localStorage.getItem('selectedShip') || 1;
 
     this.updateUI();
   }
@@ -18,6 +37,9 @@ class Player {
     playerELM.style.height = this.height + "px";
     playerELM.style.left = this.positionX + "px";
     playerELM.style.bottom = this.positionY + "px";
+    playerELM.style.backgroundImage = `url(../Assets/SetAssets2/ship_${this.selectedShip}.png)`;
+    playerELM.style.backgroundSize = "contain";
+    playerELM.style.backgroundRepeat = "no-repeat";
   }
 
   moveLeft() {
@@ -82,13 +104,49 @@ class Meteor {
   moveDown() {
     this.positionY -= 4;
     this.updateUI();
+    
   }
 }
+
+class Shooting{
+  constructor(){
+    this.width = 10;
+    this.height = 15;
+    this.positionX = player.positionX + player.width / 2 - this.width / 2;
+    this.positionY = player.positionY + player.height;
+    this.ShootingElm = null;
+  }
+
+  createShoot(){
+      this.ShootingElm = document.createElement("div");
+      this.ShootingElm.className = "bullet";
+      game.appendChild(this.ShootingElm);
+  }
+    updateUI() {
+    this.ShootingElm.style.width = this.width + "px";
+    this.ShootingElm.style.height = this.height + "px";
+    this.ShootingElm.style.left = this.positionX + "px";
+    this.ShootingElm.style.bottom = this.positionY + "px";
+  }
+  moveUp(){
+    this.positionY += 6
+    this.updateUI()
+  }
+  
+}
+
 
 
 
 const player = new Player();
 let MeteorsArr = [];
+let shootArr = []
+let keysPressed = {
+  left: false,
+  right: false,
+  up: false,
+  down: false
+};
 
 setInterval(() => {
   const newMeteor = new Meteor();
@@ -116,7 +174,42 @@ setInterval(() => {
   });
 }, 50);
 
+setInterval(() => {
+ shootArr.forEach((bullet, bIndex) => {
+    bullet.moveUp();
+   
+    if (bullet.positionY > gameHeight) {
+      bullet.ShootingElm.remove();
+      shootArr.splice(bIndex, 1);
+      return;
+    }
+    MeteorsArr.forEach((meteor, mIndex) => {
+      if (
+        bullet.positionX < meteor.positionX + meteor.width &&
+        bullet.positionX + bullet.width > meteor.positionX &&
+        bullet.positionY < meteor.positionY + meteor.height &&
+        bullet.positionY + bullet.height > meteor.positionY
+      ) {
+        
+        bullet.ShootingElm.remove();
+        shootArr.splice(bIndex, 1);
+
+        meteor.MeteorELM.remove();
+        MeteorsArr.splice(mIndex, 1);
+        onMeteorDestroyed()
+      }
+
+    });
+  });
+}, 20);
+
+
+
 document.addEventListener("keydown", (e) => {
+  if (e.code === "ArrowLeft") keysPressed.left = true;
+  if (e.code === "ArrowRight") keysPressed.right = true;
+  if (e.code === "ArrowUp") keysPressed.up = true;
+  if (e.code === "ArrowDown") keysPressed.down = true;
   if (
     e.code === "ArrowUp" ||
     e.code === "ArrowDown" ||
@@ -125,15 +218,41 @@ document.addEventListener("keydown", (e) => {
   ) {
     e.preventDefault();
   }
-
-  if (e.code === "ArrowLeft")
-     player.moveLeft();
-  else if (e.code === "ArrowRight") 
-    player.moveRight();
-  else if (e.code === "ArrowUp") 
-    player.moveForward();
-  else if (e.code === "ArrowDown")
-     player.moveBackwards();
+  if (e.code === "Space") {
+    const bullet = new Shooting();
+    bullet.createShoot();
+    shootArr.push(bullet);
+  }
 });
 
+  document.addEventListener("keyup", (e) => {
+  if (e.code === "ArrowLeft") keysPressed.left = false;
+  if (e.code === "ArrowRight") keysPressed.right = false;
+  if (e.code === "ArrowUp") keysPressed.up = false;
+  if (e.code === "ArrowDown") keysPressed.down = false;
+});
 
+//  smooth movement
+function smoothPlayerMove() {
+  if (keysPressed.left) player.moveLeft();
+  if (keysPressed.right) player.moveRight();
+  if (keysPressed.up) player.moveForward();
+  if (keysPressed.down) player.moveBackwards();
+  requestAnimationFrame(smoothPlayerMove);
+}
+smoothPlayerMove();
+// score
+let score = 0;
+const scoreDisplay = document.getElementById('score');
+
+function updateScore(points) {
+  score += points;
+  scoreDisplay.textContent = `Score: ${score}`;
+}
+setInterval(() => {
+  updateScore(10);
+}, 5000);
+
+function onMeteorDestroyed() {
+  updateScore(10);
+}

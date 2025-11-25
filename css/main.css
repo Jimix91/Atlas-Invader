@@ -1,10 +1,14 @@
 body {
-  background-image: url(../Assets/SetAssets2/background_stars.png);
   margin: 0;
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
   overflow: hidden;
+}
+
+#page-game {
+  background-image: url(../Assets/Space\ background.png);
+  background-size: cover;
+  background-position: center top 70%;
+  background-repeat: no-repeat;
+  min-height: 100vh;
 }
 
 #game {
@@ -15,16 +19,14 @@ body {
 }
 
 #player {
-    background-color: brown;
   position: absolute;
-  background-image: url(../Assets/SetAssets2/ship_1.png);
   background-size: contain;
   background-repeat: no-repeat;
 }
 
 .Meteor {
     
-  background-color: brown;
+ 
   position: absolute;
   background-image: url(../Assets/SetAssets2/meteor.png);
   background-size: contain;
@@ -38,8 +40,59 @@ body {
 }
 
 .bullet {
-  width: 6px;
-  height: 12px;
   background: yellow;
   position: absolute;
+}
+#page-intro {
+  background-image: url(../Assets/spaceIntroBackground.png);
+  text-align: center;
+  font-family: Arial, sans-serif;
+  color: rgb(182, 194, 194);
+  margin: 0;
+  min-height: 100vh;
+  display: flex;                /* Añadido */
+  flex-direction: column;       /* Añadido */
+  justify-content: center;      /* Añadido */
+  align-items: center;          /* Añadido */
+}
+
+
+#page-intro .spaceships {
+  display: flex;
+  justify-content: center;
+  gap: 40px;
+  margin-top: 40px;
+}
+
+#page-intro .ship {
+  cursor: pointer;
+  border: 3px solid transparent;
+  border-radius: 10px;
+  transition: border 0.2s;
+}
+
+#page-intro .ship:hover {
+  border: 3px solid #0ff;
+}
+
+#page-intro .ship img {
+  width: 80px;
+  height: 100px;
+}
+
+#page-intro h1 {
+  margin-top: 60px;
+  font-size: 2.5em;
+}
+.intro-box {
+  background: rgba(30, 30, 60, 0.92);
+  border: 3px solid #0ff;
+  border-radius: 18px;
+  box-shadow: 0 0 24px #0ff8, 0 0 8px #222 inset;
+  padding: 40px 60px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 380px;
+  max-width: 90vw;
 }
