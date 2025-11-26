@@ -8,7 +8,7 @@ if (document.body.id === "page-intro") {
     ship.addEventListener('click', function() {
       const shipId = ship.getAttribute('data-ship');
       localStorage.setItem('selectedShip', shipId);
-      window.location.href = 'index.html';
+      window.location.href = 'game.html';
     });
   });
 }
@@ -168,7 +168,6 @@ setInterval(() => {
       player.positionY < MeteorInstance.positionY + MeteorInstance.height &&
       player.positionY + player.height > MeteorInstance.positionY
     ) {
-      console.log("game over my fren!!");
       location.href = "gameover.html";
     }
   });
