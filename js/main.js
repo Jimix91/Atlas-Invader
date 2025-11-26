@@ -37,7 +37,7 @@ class Player {
     playerELM.style.height = this.height + "px";
     playerELM.style.left = this.positionX + "px";
     playerELM.style.bottom = this.positionY + "px";
-    playerELM.style.backgroundImage = `url(../Assets/SetAssets2/ship_${this.selectedShip}.png)`;
+    playerELM.style.backgroundImage = `url(./Assets/SetAssets2/ship_${this.selectedShip}.png)`;
     playerELM.style.backgroundSize = "contain";
     playerELM.style.backgroundRepeat = "no-repeat";
   }

@@ -4,7 +4,7 @@ body {
 }
 
 #page-game {
-  background-image: url(../Assets/Space\ background.png);
+  background-image: url(./Assets/Space\ background.png);
   background-size: cover;
   background-position: center top 70%;
   background-repeat: no-repeat;
@@ -28,7 +28,7 @@ body {
     
  
   position: absolute;
-  background-image: url(../Assets/SetAssets2/meteor.png);
+  background-image: url(./Assets/SetAssets2/meteor.png);
   background-size: contain;
   background-repeat: no-repeat;
 }
@@ -44,7 +44,7 @@ body {
   position: absolute;
 }
 #page-intro {
-  background-image: url(../Assets/spaceIntroBackground.png);
+  background-image: url(./Assets/spaceIntroBackground.png);
   text-align: center;
   font-family: Arial, sans-serif;
   color: rgb(182, 194, 194);
