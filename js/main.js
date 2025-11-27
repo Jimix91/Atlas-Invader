@@ -27,8 +27,16 @@ window.addEventListener('load', () => {
 })
 //sonidos y audio
 const shootSound = new Audio("./Assets/audio/laser-gun-shot-sound-future-sci-fi-lazer-wobble-chakongaudio-174883.mp3");
-shootSound.volume = 0.8;      
+shootSound.volume = 0.5;      
 shootSound.preload = "auto";
+
+const hitSound = new Audio("./Assets/audio/SE-Explosion3-C.ogg"); // reemplaza con la ruta de tu sonido
+hitSound.volume = 0.9;
+hitSound.preload = "auto";
+
+const hitGroundSound = new Audio("./Assets/audio/SE-Explosion3-D.ogg")
+hitSound.volume = 0.9;
+hitSound.preload = "auto";
 
 const game = document.getElementById("game");
 const gameWidth = game.clientWidth;
@@ -97,6 +105,7 @@ class Player {
 class Meteor {
   constructor(size = "big", positionX = null, positionY = null) {
     this.size = size;
+    this.active = true;
     if (size === "big") {
       this.width = 150;
       this.height = 150;
@@ -157,52 +166,83 @@ class Meteor {
   }
 
   moveDown() {
+    if (!this.active) return; // solo mover meteoritos activos
+
     let speed = 2;
     if (this.size === "medium") speed = 3;
     if (this.size === "small") {
       speed = 4;
       this.positionX += this.directionX * this.speedX;
       if (this.positionX <= 0 || this.positionX >= gameWidth - this.width) {
-      this.directionX *= -1;
+        this.directionX *= -1;
+      }
     }
-  }
     this.positionY -= speed;
     this.updateUI();
   }
+
+  destroy() {
+    this.active = false; // desactiva el meteorito
+    this.MeteorELM.remove();
+  }
 }
+
 // SHOOTING
 class Shooting {
   constructor() {
-    this.width = 10;
-    this.height = 15;
+    this.width = 40;
+    this.height = 40;
     this.positionX = player.positionX + player.width / 2 - this.width / 2;
     this.positionY = player.positionY + player.height;
-    this.hitboxOffsetX = 0
-    this.hitboxOffsetY = 0
-    this.hitboxWidth = this.width
-    this.hitboxHeight = this.height
+    this.hitboxOffsetX = 0;
+    this.hitboxOffsetY = 0;
+    this.hitboxWidth = this.width;
+    this.hitboxHeight = this.height;
     this.ShootingElm = null;
   }
 
   createShoot() {
     this.ShootingElm = document.createElement("div");
     this.ShootingElm.className = "bullet";
+
+    // background de la bala
+    this.ShootingElm.style.backgroundImage = "url('./Assets/micromuzzle.PNG')";
+    this.ShootingElm.style.backgroundSize = "contain";
+    this.ShootingElm.style.backgroundRepeat = "no-repeat";
+
     game.appendChild(this.ShootingElm);
+    this.updateUI();
   }
+
   updateUI() {
     this.ShootingElm.style.width = this.width + "px";
     this.ShootingElm.style.height = this.height + "px";
     this.ShootingElm.style.left = this.positionX + "px";
     this.ShootingElm.style.bottom = this.positionY + "px";
+    this.ShootingElm.style.position = "absolute";
   }
+
   moveUp() {
-    this.positionY += 10
-    this.updateUI()
+    this.positionY += 10;
+    this.updateUI();
   }
 
+
+  updateUI() {
+    if (!this.ShootingElm) return;
+    this.ShootingElm.style.width = this.width + "px";
+    this.ShootingElm.style.height = this.height + "px";
+    this.ShootingElm.style.left = this.positionX + "px";
+    this.ShootingElm.style.bottom = this.positionY + "px";
+    this.ShootingElm.style.position = "absolute";
+    this.ShootingElm.style.zIndex = "50";
+  }
+
+  moveUp() {
+    this.positionY += 10;
+    this.updateUI();
+  }
 }
-
-
 
 
 const player = new Player();
@@ -218,28 +258,91 @@ let keysPressed = {
 setInterval(() => {
   const newMeteor = new Meteor("big");
   MeteorsArr.push(newMeteor);
-}, 5000);
+}, 8000);
 
 //METEOR COLLISION
+// METEOR COLLISION & GROUND IMPACT
 setInterval(() => {
-  MeteorsArr.forEach((MeteorInstance, index) => {
-    MeteorInstance.moveDown();
+  for (let i = MeteorsArr.length - 1; i >= 0; i--) {
+    const meteor = MeteorsArr[i];
 
+    if (!meteor.active) continue;
 
-    if (MeteorInstance.positionY + MeteorInstance.height < 0) {
-      MeteorInstance.MeteorELM.remove();
-      MeteorsArr.splice(index, 1);
+    meteor.moveDown();
+
+    // Meteorito llega al suelo
+    if (meteor.positionY <= 0) {
+      meteor.active = false;
+      meteor.MeteorELM.remove();
+
+      hitGroundSound.currentTime = 0;
+      hitGroundSound.play();
+
+      createGif(
+        meteor.positionX,
+        0,
+        meteor.width,
+        meteor.height,
+        './Assets/Explosion Audio Pack/explosion pack 1/Explosions pack/meteor small contra suelo/Preview.gif',
+        500
+      );
+
       updatePlanetHealth(10);
+      MeteorsArr.splice(i, 1);
+      continue;
     }
-    if (isCollision(player, MeteorInstance)) {
-       playerHealth -= 1;
-       updatePlayerHealth();
-      MeteorInstance.MeteorELM.remove();
-      MeteorsArr.splice(index, 1);
+
+    // Colisión con el jugador
+    if (!meteor.hitPlayer && isCollision(player, meteor)) {
+      meteor.hitPlayer = true;
+      meteor.active = false;
+
+      // eliminamos el meteorito antes de mostrar el GIF
+      meteor.MeteorELM.remove();
+
+      playerHealth -= 1;
+      updatePlayerHealth();
+
+      hitSound.currentTime = 0;
+      hitSound.play();
+
+      // Mostrar GIF en la posición del meteorito
+      createGif(
+        meteor.positionX,
+        meteor.positionY,
+        meteor.width,
+        meteor.height,
+        './Assets/Explosion Audio Pack/explosion pack 1/Explosions pack/bullet contra meteor/Preview.gif',
+        400
+      );
+
+      // Eliminamos del array
+      MeteorsArr.splice(i, 1);
     }
-    
-  });
+  }
 }, 50);
+
+// Función para crear GIF en pantalla
+function createGif(x, y, width, height, url, duration) {
+  const gif = document.createElement("div");
+  gif.style.backgroundImage = `url('${url}')`;
+  gif.style.backgroundSize = "contain";
+  gif.style.backgroundRepeat = "no-repeat";
+  gif.style.width = width + "px";
+  gif.style.height = height + "px";
+  gif.style.position = "absolute";
+  gif.style.left = x + "px";
+  gif.style.bottom = y + "px";
+  gif.style.zIndex = "100";
+
+  game.appendChild(gif);
+
+  setTimeout(() => {
+    gif.remove();
+  }, duration);
+}
+
+
 
 //SHOOTING COLLISION AND METEORITES SIZE CREATIONS(BUG DISPAROS FROZEN: FIXED)
 setInterval(() => {
@@ -258,6 +361,28 @@ setInterval(() => {
       if (isCollision(bullet, meteor)) {
         bullet.ShootingElm.remove();
         shootArr.splice(bIndex, 1);
+
+        hitSound.currentTime = 0; // para que se pueda reproducir varias veces seguidas
+        hitSound.play();
+
+        const explosion = document.createElement("div");
+        explosion.className = "explosion";
+        explosion.style.backgroundImage = "url('./Assets/Explosion Audio Pack/explosion pack 1/Explosions pack/bullet contra meteor/Preview.gif')";
+        explosion.style.backgroundSize = "contain";
+        explosion.style.backgroundRepeat = "no-repeat";
+        explosion.style.width = meteor.width + "px";
+        explosion.style.height = meteor.height + "px";
+        explosion.style.position = "absolute";
+        explosion.style.left = meteor.positionX + "px";
+        explosion.style.bottom = meteor.positionY + "px";
+        explosion.style.zIndex = "100";
+
+        game.appendChild(explosion);
+
+        
+        setTimeout(() => {
+          if (explosion) explosion.remove();
+  }, 400);
 
         meteor.health -= 1; // RESTA VIDA
 
@@ -391,3 +516,32 @@ function isCollision(objA, objB) {
     objA.positionY + objA.hitboxOffsetY + objA.hitboxHeight > objB.positionY + objB.hitboxOffsetY
   );
 }
+
+//dificultat
+let meteorSpawnInterval = 8000; // intervalo inicial de aparición (ms)
+let lastMeteorSpawn = Date.now();
+
+function adjustDifficulty() {
+  if (score >= 1000) {
+    meteorSpawnInterval = 4000; 
+  }
+  if (score >= 2000) {
+    meteorSpawnInterval = 2500; 
+  }
+  
+}
+
+function spawnMeteor() {
+  const newMeteor = new Meteor("big");
+  MeteorsArr.push(newMeteor);
+}
+
+setInterval(() => {
+  adjustDifficulty();
+  
+  const now = Date.now();
+  if (now - lastMeteorSpawn >= meteorSpawnInterval) {
+    spawnMeteor();
+    lastMeteorSpawn = now;
+  }
+}, 100);
