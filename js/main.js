@@ -126,11 +126,11 @@ class Meteor {
     this.MeteorELM.className = `Meteor ${this.size}`;
     // asignacion imagenes meteoritos
     if (this.size === "big") {
-      this.MeteorELM.style.backgroundImage = `url(../Assets/SetAssets2/meteor.png)`;
+      this.MeteorELM.style.backgroundImage = `url(./Assets/SetAssets2/meteor.png)`;
     } else if (this.size === "medium") {
-      this.MeteorELM.style.backgroundImage = `url(../Assets/space_background_pack/asteroid-1.png)`;
+      this.MeteorELM.style.backgroundImage = `url(./Assets/space_background_pack/asteroid-1.png)`;
     } else {
-      this.MeteorELM.style.backgroundImage = `url(../Assets/SetAssets2/flaming_meteor.png)`;
+      this.MeteorELM.style.backgroundImage = `url(./Assets/SetAssets2/flaming_meteor.png)`;
     }
     game.appendChild(this.MeteorELM);
   }
@@ -144,9 +144,9 @@ class Meteor {
 
   moveDown() {
     let speed = 2;
-    if (this.size === "medium") speed = 4;
+    if (this.size === "medium") speed = 3;
     if (this.size === "small") {
-      speed = 6;
+      speed = 4;
       this.positionX += this.directionX * this.speedX;
       if (this.positionX <= 0 || this.positionX >= gameWidth - this.width) {
       this.directionX *= -1;
@@ -338,11 +338,11 @@ function updatePlanetHealth(damage) {
 
   
   if (planetHealth <= 30) {
-    planetHealthBar.style.background = "rgba(255, 94, 0, 0.94)"; // Rojo
+    planetHealthBar.style.background = "rgba(255, 94, 0, 0.94)"; 
   } else if (planetHealth <= 60) {
-    planetHealthBar.style.background = "#ff0"; // Amarillo
+    planetHealthBar.style.background = "#ff0"; 
   } else {
-    planetHealthBar.style.background = "#0f0"; // Verde
+    planetHealthBar.style.background = "#0f0"; 
   }
 
   if (planetHealth === 0) {
