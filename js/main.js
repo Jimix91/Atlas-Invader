@@ -1,49 +1,67 @@
-//selecion de INTRO nave
+function setupAudio() {
+  // Sonidos del juego
+  const shootSound = new Audio("./Assets/audio/laser-gun-shot-sound-future-sci-fi-lazer-wobble-chakongaudio-174883.mp3");
+  shootSound.volume = 0.5;
+  shootSound.preload = "auto";
+
+  const hitSound = new Audio("./Assets/audio/SE-Explosion3-C.ogg");
+  hitSound.volume = 1;
+  hitSound.preload = "auto";
+
+  const hitGroundSound = new Audio("./Assets/audio/SE-Explosion3-D.ogg");
+  hitGroundSound.volume = 0.9;
+  hitGroundSound.preload = "auto";
+
+  // Música de index
+  const introMusic = document.getElementById("introMusic-index");
+  if (introMusic) {
+    introMusic.volume = 0.5;
+    introMusic.preload = "auto";
+
+    // Se reproduce al primer click del usuario
+    const playIntroMusic = () => {
+      introMusic.play().catch(() => {});
+      window.removeEventListener("click", playIntroMusic);
+    };
+    window.addEventListener("click", playIntroMusic, { once: true });
+  }
+
+  // Música de game
+  const gameMusic = document.getElementById("music-index");
+  if (gameMusic) {
+    gameMusic.volume = 0.4;
+    gameMusic.preload = "auto";
+    gameMusic.play().catch(() => {});
+  }
+
+  return { shootSound, hitSound, hitGroundSound, introMusic, gameMusic };
+}
+
+const audio = setupAudio();
+
+/* -------------------------------
+   SELECCIÓN DE NAVE (INTRO)
+--------------------------------*/
 if (document.body.id === "page-intro") {
-
   const ships = document.querySelectorAll('.ship');
-
-  ships.forEach(function (ship) {
-
-    ship.addEventListener('click', function () {
-      const shipId = ship.getAttribute('data-ship');
-      localStorage.setItem('selectedShip', shipId);
+  ships.forEach(ship => {
+    ship.addEventListener('click', () => {
+      localStorage.setItem('selectedShip', ship.getAttribute('data-ship'));
       window.location.href = 'game.html';
     });
   });
 }
- //instrucciones de juego
+
+/* -------------------------------
+   INSTRUCCIONES DE JUEGO
+--------------------------------*/
 window.addEventListener('load', () => {
   const instructionBox = document.getElementById('instruction-box');
+  if (!instructionBox) return;
 
   instructionBox.style.display = 'block';
-  
-  let gameActive = false;
-
-  setTimeout(() => {
-    instructionBox.style.display = 'none';
-    gameActive = true;
-  }, 10000);
-})
-//sonidos y audio
-const shootSound = new Audio("./Assets/audio/laser-gun-shot-sound-future-sci-fi-lazer-wobble-chakongaudio-174883.mp3");
-shootSound.volume = 0.5;      
-shootSound.preload = "auto";
-
-const hitSound = new Audio("./Assets/audio/SE-Explosion3-C.ogg"); 
-hitSound.volume = 1;
-hitSound.preload = "auto";
-
-const hitGroundSound = new Audio("./Assets/audio/SE-Explosion3-D.ogg")
-hitSound.volume = 0.9;
-hitSound.preload = "auto";
-
-const musicIndex = document.getElementById("music-index");
-musicIndex.volume = 0.4; 
-
-const music = document.getElementById("music-index");
-music.muted = false;
-music.volume = 0.4;
+  setTimeout(() => instructionBox.style.display = 'none', 10000);
+});
 
 
 const game = document.getElementById("game");
@@ -283,8 +301,8 @@ setInterval(() => {
       meteor.active = false;
       meteor.MeteorELM.remove();
 
-      hitGroundSound.currentTime = 0;
-      hitGroundSound.play();
+      audio.hitGroundSound.currentTime = 0;
+      audio.hitGroundSound.play();
 
       createGif(
         meteor.positionX,
@@ -311,8 +329,8 @@ setInterval(() => {
       playerHealth -= 1;
       updatePlayerHealth();
 
-      hitSound.currentTime = 0;
-      hitSound.play();
+      audio.hitSound.currentTime = 0;
+      audio.hitSound.play();
 
       // Mostrar GIF en la posición del meteorito
       createGif(
@@ -370,8 +388,8 @@ setInterval(() => {
         bullet.ShootingElm.remove();
         shootArr.splice(bIndex, 1);
 
-        hitSound.currentTime = 0; // para que se pueda reproducir varias veces seguidas
-        hitSound.play();
+        audio.hitSound.currentTime = 0;
+        audio.hitSound.play();
 
         const explosion = document.createElement("div");
         explosion.className = "explosion";
@@ -434,10 +452,10 @@ document.addEventListener("keydown", (e) => {
   ) {
     e.preventDefault();
   }
+ 
   if (e.code === "Space") {
-    shootSound.currentTime = 0;
-    shootSound.play();
-    
+    audio.shootSound.currentTime = 0;
+    audio.shootSound.play();
     const bullet = new Shooting();
     bullet.createShoot();
     shootArr.push(bullet);
