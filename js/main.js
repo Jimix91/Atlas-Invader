@@ -30,7 +30,7 @@ const shootSound = new Audio("./Assets/audio/laser-gun-shot-sound-future-sci-fi-
 shootSound.volume = 0.5;      
 shootSound.preload = "auto";
 
-const hitSound = new Audio("./Assets/audio/SE-Explosion3-C.ogg"); // reemplaza con la ruta de tu sonido
+const hitSound = new Audio("./Assets/audio/SE-Explosion3-C.ogg"); 
 hitSound.volume = 1;
 hitSound.preload = "auto";
 
@@ -41,7 +41,9 @@ hitSound.preload = "auto";
 const musicIndex = document.getElementById("music-index");
 musicIndex.volume = 0.4; 
 
-
+const music = document.getElementById("music-index");
+music.muted = false;
+music.volume = 0.4;
 
 
 const game = document.getElementById("game");
